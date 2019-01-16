@@ -1,0 +1,17 @@
+{
+  "infura": {
+    "gateway_url": "https://mainnet.infura.io/v3/"
+  },
+  "ethereum": {
+    "BMD": {
+      "contract": {
+        "address": "0xDae7104526FAF336c026999F154F6CdEAe58bB2d"
+      }
+    },
+    "BMV": {
+      "contract": {
+        "address": "0x952a8C6F399B0dc3986b970910e6de778F1A1B3e"
+      }
+    }
+  }
+}
