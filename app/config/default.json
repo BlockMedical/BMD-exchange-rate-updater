@@ -1,0 +1,17 @@
+{
+  "infura": {
+    "gateway_url": "https://ropsten.infura.io/v3/"
+  },
+  "ethereum": {
+    "BMD": {
+      "contract": {
+        "address": "0xCC239Da0224D472e0bd3C16516cE1fca9553f938"
+      }
+    },
+    "BMV": {
+      "contract": {
+        "address": "0xbD5806D7816F5df6254B62852D6c5335ce4E466E"
+      }
+    }
+  }
+}
