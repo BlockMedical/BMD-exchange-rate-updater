@@ -30,6 +30,7 @@
     "web3": "^0.20.7",
     "winston": "^3.1.0",
     "winston-daily-rotate-file": "^3.5.1",
-    "cryptiles": "~> 4.1.2"
+    "cryptiles": "~> 4.1.2",
+    "lodash": ">=4.17.5"
   }
 }
