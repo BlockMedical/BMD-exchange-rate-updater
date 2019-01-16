@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BlockMedical/BMD-exchange-rate-updater.git"
+    "url": "git+https://github.com/alee-blcksync/contract-updater.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BlockMedical/BMD-exchange-rate-updater/issues"
+    "url": "https://github.com/alee-blocksync/contract-updater/issues"
   },
-  "homepage": "https://github.com/BlockMedical/BMD-exchange-rate-updater#readme",
+  "homepage": "https://github.com/alee-blocksync/contract-updater#readme",
   "dependencies": {
     "bignumber.js": "^8.0.2",
     "coinbase": "^2.0.8",
@@ -29,6 +29,7 @@
     "uuid": "^3.3.2",
     "web3": "^0.20.7",
     "winston": "^3.1.0",
-    "winston-daily-rotate-file": "^3.5.1"
+    "winston-daily-rotate-file": "^3.5.1",
+    "cryptiles": "~> 4.1.2"
   }
 }
