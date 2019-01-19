@@ -114,10 +114,38 @@ client.getExchangeRates({ currency: "ETH" }, function(err, rates) {
     // bmd_contract_instance.setExchangeRate().getData([new_exrate]);
     // e.g. 0xdb068e0e000000000000000000000000000000000000000000000006c6b935b8bbd40000
     let dd = "0x" + func_abi + padd_new_exrate;
-    let notOwner = process.env.PUBKEY;
-    let notOwnerPrivateKey = process.env.PRIVKEY;
+    let notOwner = process.env.BMD_PUBKEY;
+    let notOwnerPrivateKey = process.env.BMD_PRIVKEY;
     try {
       let result = rawTransaction(bmd_web3, notOwner, notOwnerPrivateKey, bmd_address, dd, 0);
+    } catch (tx_err) {
+      console.log(tx_err);
+    }
+  }
+});
+
+client.getExchangeRates({ currency: "ETH" }, function(err, rates) {
+  if (err) {
+    logger.error(err);
+    return err;
+  } else {
+    logger.info(rates.data.rates.USD);
+    let value = new BigNumber(0).multipliedBy(eth_to_wei); // 1 eth = 1 * 10 ** 18 wei.
+    let new_exrate = new BigNumber(rates.data.rates.USD).multipliedBy(eth_to_wei).toString(16);
+    let padd_new_exrate = new_exrate.padStart(64, "0");
+    let func_abi = ABI_coder.methodID("setExchangeRate", ["uint256"]).toString("hex");
+    logger.info("contract function encoded: " + func_abi);
+    assert.equal(func_abi, "db068e0e", "contract function ABI has changed, please verify and update");
+    logger.info("new exchange rate in hex shows " + padd_new_exrate);
+    // buggy APIs these days. the following in web3 has issue to address bignumbers. therefore,
+    // we manually craft the ABI and encoding.... sigh
+    // bmd_contract_instance.setExchangeRate().getData([new_exrate]);
+    // e.g. 0xdb068e0e000000000000000000000000000000000000000000000006c6b935b8bbd40000
+    let dd = "0x" + func_abi + padd_new_exrate;
+    let notOwner = process.env.BMV_PUBKEY;
+    let notOwnerPrivateKey = process.env.BMV_PRIVKEY;
+    try {
+      let result = rawTransaction(bmv_web3, notOwner, notOwnerPrivateKey, bmv_address, dd, 0);
     } catch (tx_err) {
       console.log(tx_err);
     }
