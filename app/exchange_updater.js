@@ -78,6 +78,29 @@ function normalizePrivateKey(privateKey) {
   return privateKey.startsWith("0x") ? privateKey : "0x" + privateKey;
 }
 
+async function getFeeOptions() {
+  if (config.has("ethereum.gas.gasPriceGwei")) {
+    return {
+      gasPrice: ethers.parseUnits(String(config.get("ethereum.gas.gasPriceGwei")), "gwei")
+    };
+  }
+
+  const feeData = await provider.getFeeData();
+  if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+    return {
+      maxFeePerGas: feeData.maxFeePerGas,
+      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas
+    };
+  }
+  if (feeData.gasPrice) {
+    return {
+      gasPrice: feeData.gasPrice
+    };
+  }
+
+  throw new Error("Unable to determine transaction fee data from provider");
+}
+
 async function updateExchangeRate(name, contractAddress, publicKey, privateKey, usdRate) {
   const wallet = new ethers.Wallet(normalizePrivateKey(privateKey), provider);
   if (publicKey && wallet.address.toLowerCase() !== publicKey.toLowerCase()) {
@@ -98,13 +121,14 @@ async function updateExchangeRate(name, contractAddress, publicKey, privateKey, 
     value: 0
   });
   const nonce = Number(await provider.send("eth_getTransactionCount", [wallet.address, "latest"]));
+  const feeOptions = await getFeeOptions();
   const tx = await wallet.sendTransaction({
     to: contractAddress,
     data: data,
     value: 0,
     gasLimit: (estimatedGas * 120n) / 100n,
-    gasPrice: ethers.parseUnits("12", "gwei"),
-    nonce: nonce
+    nonce: nonce,
+    ...feeOptions
   });
   getLogger().info(`${name} exchange rate transaction sent: ${tx.hash}`);
   const receipt = await tx.wait();
@@ -136,6 +160,7 @@ if (require.main === module) {
 module.exports = {
   getEthUsdRate,
   normalizePrivateKey,
+  getFeeOptions,
   updateExchangeRate,
   main
 };
