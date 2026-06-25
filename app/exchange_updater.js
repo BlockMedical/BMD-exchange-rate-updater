@@ -91,14 +91,24 @@ async function updateExchangeRate(name, contractAddress, publicKey, privateKey, 
   assert.equal(functionSelector, "db068e0e", "contract function ABI has changed, please verify and update");
   getLogger().info(`${name} new exchange rate in wei-scaled units: ${exchangeRate.toString()}`);
 
+  const estimatedGas = await provider.estimateGas({
+    from: wallet.address,
+    to: contractAddress,
+    data: data,
+    value: 0
+  });
+  const nonce = Number(await provider.send("eth_getTransactionCount", [wallet.address, "latest"]));
   const tx = await wallet.sendTransaction({
     to: contractAddress,
     data: data,
     value: 0,
-    gasLimit: 30000,
-    gasPrice: ethers.parseUnits("12", "gwei")
+    gasLimit: (estimatedGas * 120n) / 100n,
+    gasPrice: ethers.parseUnits("12", "gwei"),
+    nonce: nonce
   });
   getLogger().info(`${name} exchange rate transaction sent: ${tx.hash}`);
+  const receipt = await tx.wait();
+  getLogger().info(`${name} exchange rate transaction confirmed in block ${receipt.blockNumber}`);
   return tx.hash;
 }
 
@@ -112,10 +122,8 @@ async function main() {
   const usdRate = await getEthUsdRate();
   getLogger().info(`ETH/USD rate from Coinbase: ${usdRate}`);
 
-  await Promise.all([
-    updateExchangeRate("BMD", bmdAddress, process.env.BMD_PUBKEY, process.env.BMD_PRIVKEY, usdRate),
-    updateExchangeRate("BMV", bmvAddress, process.env.BMV_PUBKEY, process.env.BMV_PRIVKEY, usdRate)
-  ]);
+  await updateExchangeRate("BMD", bmdAddress, process.env.BMD_PUBKEY, process.env.BMD_PRIVKEY, usdRate);
+  await updateExchangeRate("BMV", bmvAddress, process.env.BMV_PUBKEY, process.env.BMV_PRIVKEY, usdRate);
 }
 
 if (require.main === module) {
